@@ -198,7 +198,7 @@ module firstSQ (
    end
 endmodule
 
-module taskTWO (
+module task_B (
     input CLK,
     input CTRLbtn, 
     input UPbtn,
