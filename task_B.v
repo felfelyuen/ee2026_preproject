@@ -40,31 +40,6 @@ module clock_1kHZ ( //incremenets every 1ms
     end
 endmodule
 
-module changeLED (
-    input sw4,
-    input SLOWCLK,
-    input [9:0] x, 
-    input [6:0] y, 
-    output reg [15:0] LEDdata
-    );
-    
-    always @ (posedge SLOWCLK) begin
-    //oled_data = sw4 ? 16'hF800 : 16'h07E0;
-    
-       if ((x >= 5 & x <= 65 & y <= 20 & y >= 2) 
-       | (x >= 40 & x <= 93 & y <= 40 & y >= 30)
-       | (x >= 6 & x <= 20 & y <= 55 & y >= 50)) begin
-       LEDdata = sw4 ? 16'h000F : 16'hF800;
-       //oled_data = 16'h000F;
-       end
-       else begin
-       LEDdata = sw4 ? 16'h8FA0 : 16'h07E0;
-       //oled_data = 16'h8FA0;
-       end
-       
-    end
-endmodule
-
 module increaseCOUNT (
     input button,
     input CLK,
