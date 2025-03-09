@@ -1,9 +1,16 @@
 //Displays 07 (group ID)
+
+wire [6:0]x;
+wire [5:0]y;
+reg [15:0]oled_data = 0;
+
+flexible_clock_divider my_25mhz_clk (.basys_clock(basys_clock), .m(32'b1), .my_slow_clock(clk_25mhz));
+
 always @ (posedge clk_25mhz) begin
-    if ((x >= 12 && x <= 35 && y >= 10 && y <= 18)
-        || (x >= 12 && x <= 35 && y >= 40 && y <= 48)
+    if ((x >= 12 && x <= 40 && y >= 10 && y <= 18)
+        || (x >= 12 && x <= 40 && y >= 40 && y <= 48)
         || (x >= 12 && x <= 20 && y >= 18 && y <= 40)
-        || (x >= 27 && x <= 35 && y >= 18 && y <= 40)
+        || (x >= 32 && x <= 40 && y >= 18 && y <= 40)
         || (x >= 55 && x <= 78 && y >= 10 && y <= 18)
         || (x >= 70 && x <= 78 && y >= 18 && y <= 48)) begin
         oled_data = 16'b11111_000000_00000; //red
