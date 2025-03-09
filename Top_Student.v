@@ -17,5 +17,5 @@ module Top_Student (
     input DOWNbtn,
     output [7:0] Jx
     );
-        taskTWO task2 (CLK, CTRLbtn, UPbtn, DOWNbtn);
+        task_B task2 (CLK, CTRLbtn, UPbtn, DOWNbtn);
 endmodule
