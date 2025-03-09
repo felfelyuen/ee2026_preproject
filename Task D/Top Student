@@ -1,0 +1,75 @@
+`timescale 1ns / 1ps
+
+//////////////////////////////////////////////////////////////////////////////////
+//
+//  FILL IN THE FOLLOWING INFORMATION:
+//  STUDENT A NAME: 
+//  STUDENT B NAME:
+//  STUDENT C NAME: 
+//  STUDENT D NAME:  
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module Top_Student (
+  input basys_clock,
+  input [3:0]pb,
+  output [7:0]JB
+);
+  
+  wire clk_6p25mhz, clk_25mhz, clk_30hz;
+  reg reset;
+  reg [15:0]pixel_data;
+  wire [12:0]pixel_index;
+  wire fb, sending_pixels, sample_pixel;
+  wire [6:0]x;
+  wire [5:0]y;
+  wire [6:0]current_x;
+  wire [5:0]current_y;
+  reg [15:0]oled_data = 0;
+  reg [3:0]state = 0;
+
+  flexible_clock_divider my_6p25mhz_clk (.basys_clock(basys_clock), .m(32'b0111), .my_slow_clock(clk_6p25mhz));
+  flexible_clock_divider my_25mhz_clk (.basys_clock(basys_clock), .m(32'b1), .my_slow_clock(clk_25mhz));
+  flexible_clock_divider my_30hz_clk (.basys_clock(basys_clock), .m(32'h196E69), .my_slow_clock(clk_30hz));
+  Oled_Display led_display (
+      .clk(clk_6p25mhz),
+      .reset(0),
+      .frame_begin(fb),
+      .sending_pixels(sending_pixels),
+      .sample_pixel(sample_pixel),
+      .pixel_index(pixel_index),
+      .pixel_data(oled_data),
+      .cs(JB[0]),
+      .sdin(JB[1]),
+      .sclk(JB[3]),
+      .d_cn(JB[4]),
+      .resn(JB[5]),
+      .vccen(JB[6]),
+      .pmoden(JB[7])
+  );
+  
+  convert_to_xy xy_coordinates (.pixel_index(pixel_index), .x(x), .y(y));
+  
+  always @ (posedge clk_25mhz) begin
+      if (x >= 66 && y <= 29) begin
+          oled_data = 16'b11111_000000_00000; //red
+      end else if (x >= current_x && x <= current_x + 9 && y >= current_y && y <= current_y + 9) begin
+          oled_data = 16'b00000_111111_00000; //green
+      end else begin
+          oled_data = 16'b00000_000000_00000; //black
+      end
+  end
+  
+  move_green_square(
+      .basys_clock(basys_clock),
+      .clock_30hz(clk_30hz),
+      .clock_25Mhz(clk_25mhz),
+      .x(x),
+      .y(y),
+      .pb(pb),
+      .current_x(current_x),
+      .current_y(current_y)
+  );
+
+endmodule
