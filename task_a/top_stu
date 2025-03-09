@@ -1,0 +1,58 @@
+`timescale 1ns / 1ps
+
+module Top_Student (
+    input clk,
+    output [7:0] JX,
+    input [2:0] btn
+);
+    integer x, y, dx, dy;
+
+    parameter DRAW_BORDER = 3'b000, DRAW_RING = 3'b001, UP_SIZE = 3'b010, LOW_SIZE = 3'b100;
+    reg ring_enabled = 0;  
+    reg [6:0] outer_diam = 30; 
+    reg [6:0] inner_diam = 25; 
+    reg [15:0] dist_sq;
+    
+    wire sclk_6p25mhz;
+    wire sclk_1khz;
+    wire [15:0] oled_data;
+    wire fb;
+    wire sending_pixel;
+    wire sample_pixel;
+    wire [12:0] pixel_index;
+
+ 
+    slow_clk f0 (clk, 32'd7, sclk_6p25mhz);
+    slow_clk f1 (clk, 32'd1000, sclk_1khz);
+
+
+    Oled_Display f2 (
+        .clk(sclk_6p25mhz), 
+        .reset(0), 
+        .frame_begin(fb), 
+        .sending_pixels(sending_pixel),
+        .sample_pixel(sample_pixel), 
+        .pixel_index(pixel_index), 
+        .pixel_data(oled_data), 
+        .cs(JX[0]),
+        .sdin(JX[1]), 
+        .sclk(JX[3]), 
+        .d_cn(JX[4]), 
+        .resn(JX[5]), 
+        .vccen(JX[6]),
+        .pmoden(JX[7])
+    );
+    
+  task_A t1 (
+            .clk(clk),
+            .JX(JX),
+            .btn(btn),
+            .sclk_1khz(sclk_1khz),
+            .pixel_index(pixel_index),
+            .oled_data(oled_data),
+            .sclk_6p25mhz(sclk_6p25mhz),
+            .fb(fb),
+            .sending_pixel(sending_pixel),
+            .sample_pixel(sample_pixel)
+        );
+endmodule
