@@ -52,7 +52,7 @@ module Top_Student (
     reg pb_last = 0; // Stores the previous state of pb[0]
 
     // Instantiate Modules
-    variable_changer fa0 (.variable_clock(var_clock), .var_x(var_x), .var_y(var_y));
+    variable_changer fa0 (.state(state), .variable_clock(var_clock), .var_x(var_x), .var_y(var_y));
     variable_clock variableclk (.state(state), .fourtyfiveHz_clock(fourtyfiveHz_clock), .variable_clock(var_clock));
     coord_system convertor (.pixel_index(pixel_index), .x(x), .y(y));
     flexible_clock_divider slow_45Hz_clock (basys_clock, 555555, fourtyfiveHz_clock);
@@ -71,7 +71,7 @@ module Top_Student (
         always @ (posedge slow_clock) begin
             pb_last <= pb[4];
             if (pb_last == 1 && pb[4] == 0 && state == 0) begin
-                state <= 5'b00010;  // Falling edge detected
+                state <= 5'd2;  // Falling edge detected
             end
     
             //----------------------------------
@@ -79,28 +79,28 @@ module Top_Student (
             //----------------------------------
             oled_data <= 16'b00000_000000_00000; // Default background (black)
             
-            if (state == 0 || state == 5'b00001) begin
+            if (state == 0 || state == 5'd1) begin
                 if (x >= 7'd84 && y <= 6'd11) begin
                     oled_data <= 16'b11111_111111_00000; // Yellow square
                 end
             end
-            else if (state == 5'b00010) begin
+            else if (state == 5'd2) begin
                 if (x >= 7'd84 && y <= var_y + 11) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
                 if (var_y == 44) begin
-                    state <= 5'b00011;
+                    state <= 5'd3;
                 end
             end
-            else if (state == 5'b00011) begin
+            else if (state == 5'd3) begin
                 if (x >= 7'd84 && y <= var_y + 11) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
                 if (var_y == 6'd52) begin
-                    state <= 5'b00100;
+                    state <= 5'd4;
                 end
             end
-            else if (state == 5'b00100) begin
+            else if (state == 5'd4) begin
                 if (x >= 7'd84) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
@@ -108,178 +108,138 @@ module Top_Student (
                     oled_data <= 16'b11111_111111_00000;
                 end
                 if (var_x == 7'd77) begin
-                    state <= 5'b00101;
+                    state <= 5'd5;
                 end
             end
-            else if (state == 5'b00101 || state == 5'b00110) begin
-                if (var_x == 7'd55) begin
-                    state <= 5'b00110;
-                end
-                else if (var_x == 7'd47) begin
-                    state <= 5'b00111;
-                end
+            else if (state == 5'd5 || state == 5'd6) begin
                 if (x >= 7'd84) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
                 if (x >= var_x && y >= 6'd52) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
+                if (var_x == 7'd50) begin
+                    state <= 5'd6;
+                end
+                if (var_x == 7'd42) begin
+                    state <= 5'd7;
+                end
             end
-            else if (state == 5'b00111 || state == 5'b01000 || state == 5'b01001) begin
+            else if (state == 5'd7 || state == 5'd8 || state == 5'd9) begin         
+                if (x >= 7'd84) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && y >= 6'd52) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && x <= 7'd53 && y >= var_y) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
                 if (var_y == 6'd45) begin
-                    state <= 5'b01000;
+                    state <= 5'd8;
                 end
-                else if (var_y == 6'd39) begin
-                    state <= 5'b01001;
+                if (var_y == 6'd34) begin
+                    state <= 5'd9;
                 end
-                else if (var_y == 6'd31) begin
-                    state <= 5'b10000;
-                end            
-                if (x >= 7'd84) begin
-                    oled_data <= 16'b11111_111111_00000;
-                end
-                if (x >= 7'd47 && y >= 6'd52) begin
-                    oled_data <= 16'b11111_111111_00000;
-                end
-                if (x >= 7'd47 && x <= 7'd58 && y >= var_y) begin
-                    oled_data <= 16'b11111_111111_00000;
+                if (var_y == 6'd26) begin
+                    state <= 5'd10;
                 end
             end
-            else if (state == 5'b10000) begin
+            else if (state == 5'd10 || state == 5'd11 || state == 5'd12) begin
                 if (x >= 7'd84) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
-                if (x >= 7'd47 && y >= 6'd52) begin
+                if (x >= 7'd42 && y >= 6'd52) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
-                if (x >= 7'd47 && x <= 7'd58 && y >= 6'd31) begin
+                if (x >= 7'd42 && x <= 7'd53 && y >= 6'd26) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
-                if (x>= 7'd47 && x <= 7'd81 && y >= 6'd31 && y <= 6'd42) begin
+                if (x>= 7'd42 && x <= var_x + 11 && y >= 6'd26 && y <= 6'd37) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
-                if (x >= 7'd70 && x <= 7'd81 && y <= 6'd42 && y >= 0) begin
+                if (var_x == 7'd49) begin
+                    state <= 5'd11;
+                end
+                if (var_x == 7'd55) begin
+                    state <= 5'd12;
+                end
+                if (var_x == 7'd63) begin
+                    state <= 5'd13;
+                end
+            end
+            else if (state == 5'd13 || state == 5'd14 || state == 5'd15) begin
+                if (x >= 7'd84) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && y >= 6'd52) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && x <= 7'd53 && y >= 6'd26) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x>= 7'd42 && x <= 7'd74 && y >= 6'd26 && y <= 6'd37) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd63 && x <= 7'd74 && y >= var_y && y <= 37 ) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (var_y == 33) begin
+                    state <= 5'd14;
+                end
+                if (var_y == 8) begin
+                    state <= 5'd15;
+                end
+                if (var_y == 0) begin
+                    state <= 5'd16;
+                end
+            end
+            else if (state == 5'd16 || state == 5'd17) begin
+                if (x >= 7'd84) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && y >= 6'd52) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && x <= 7'd53 && y >= 6'd26) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && x <= 7'd74 && y >= 6'd26 && y <= 6'd37) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd63 && x <= 7'd74 && y <= 6'd37 && y >= 0) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
                 if (x >= 7'd70 && x <= var_x + 11 && y <= 6'd10) begin
                     oled_data <= 16'b11111_111111_00000;
                 end
                 if (var_x == 7'd84) begin
-                    state <= 5'b10001;
+                    state <= 5'd18;
                 end
             end
-            else if (state == 5'b10001) begin
-                state <= 0; // Reset state
+            else if (state == 5'd18) begin
+                if (x >= 7'd84) begin
+                oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && y >= 6'd52) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && x <= 7'd53 && y >= 6'd26) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd42 && x <= 7'd74 && y >= 6'd26 && y <= 6'd37) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd63 && x <= 7'd74 && y <= 6'd37 && y >= 0) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (x >= 7'd70 && y <= 6'd10) begin
+                    oled_data <= 16'b11111_111111_00000;
+                end
+                if (pb_last == 1 && pb[4] == 0) begin
+                    state <= 5'd2; // Reset state
+                end
             end
         end
     
     endmodule
-/**
-    // Detect Falling Edge of pb[0]
-    always @ (posedge slow_clock) begin
-        if (pb_last == 1 && pb[0] == 0 && state == 0) begin  // Falling edge detected (1 → 0)
-            state <= 5'b00010;
-        end
-        pb_last <= pb[0];  // Update last pb[0] state
-    end
-
-    // OLED Display Logic (State-Based Graphics)
-    always @ (posedge slow_clock) begin
-        oled_data <= 16'b00000_000000_00000; // Default background (black)
-        
-        if (state == 0 || state == 5'b00001) begin
-            if (x >= 7'd84 && y <= 6'd11) begin
-                oled_data <= 16'b11111_111111_00000; // Yellow square
-            end
-        end
-        else if (state == 5'b00010) begin
-            if (x >= 7'd84 && y <= var_y + 11) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (var_y == 44) begin
-                state <= 5'b00011;
-            end
-        end
-        else if (state == 5'b00011) begin
-            if (x >= 7'd84 && y <= var_y + 11) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (var_y == 6'd52) begin
-                state <= 5'b00100;
-            end
-        end
-        else if (state == 5'b00100) begin
-            if (x >= 7'd84) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= var_x && y >= 6'd52) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (var_x == 7'd77) begin
-                state <= 5'b00101;
-            end
-        end
-        else if (state == 5'b00101 || state == 5'b00110) begin
-            if (var_x == 7'd55) begin
-                state <= 5'b00110;
-            end
-            else if (var_x == 7'd47) begin
-                state <= 5'b00111;
-            end
-            if (x >= 7'd84) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= var_x && y >= 6'd52) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-        end
-        else if (state == 5'b00111 || state == 5'b01000 || state == 5'b01001) begin
-            if (var_y == 6'd45) begin
-                state <= 5'b01000;
-            end
-            else if (var_y == 6'd39) begin
-                state <= 5'b01001;
-            end
-            else if (var_y == 6'd31) begin
-                state <= 5'b10000;
-            end            
-            if (x >= 7'd84) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= 7'd47 && y >= 6'd52) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= 7'd47 && x <= 7'd58 && y >= var_y) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-        end
-        else if (state == 5'b10000) begin
-            if (x >= 7'd84) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= 7'd47 && y >= 6'd52) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= 7'd47 && x <= 7'd58 && y >= 6'd31) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x>= 7'd47 && x <= 7'd81 && y >= 6'd31 && y <= 6'd42) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= 7'd70 && x <= 7'd81 && y <= 6'd42 && y >= 0) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (x >= 7'd70 && x <= var_x + 11 && y <= 6'd10) begin
-                oled_data <= 16'b11111_111111_00000;
-            end
-            if (var_x == 7'd84) begin
-                state <= 5'b10001;
-            end
-        end
-        else if (state == 5'b10001) begin
-            state <= 0; // Reset state
-        end
-    end
-
-endmodule
-*/
