@@ -21,6 +21,7 @@
 
 
 module variable_changer(
+    input [4:0] state,
     input variable_clock,
     output reg [6:0] var_x = 7'd84,
     output reg [6:0] var_y = 6'd0
@@ -29,6 +30,7 @@ module variable_changer(
     reg [2:0] states = 0;
     
     always @ (posedge variable_clock) begin
+    if (state >= 5'd2 && state <5'd18) begin
         if (states == 0) begin
             var_y <= var_y + 1;
             if (var_y == 52) begin
@@ -37,19 +39,19 @@ module variable_changer(
         end
         else if (states == 3'd1)  begin
             var_x <= var_x - 1;
-            if (var_x == 47) begin
+            if (var_x == 42) begin
                 states <= 3'd2;
             end
         end
         else if (states == 3'd2) begin
             var_y <= var_y - 1;
-            if (var_y == 31) begin
+            if (var_y == 26) begin
                  states <= 3'd3;
             end
         end
         else if (states == 3'd3) begin
             var_x <= var_x + 1;
-            if (var_x == 72) begin
+            if (var_x == 63) begin
                 states <= 3'd4;
             end
         end
@@ -70,5 +72,6 @@ module variable_changer(
             var_y <= 6'd0;
             states <= 0;
         end
+    end
     end
 endmodule
