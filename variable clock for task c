@@ -29,7 +29,7 @@ module variable_clock(
     reg [1:0] clk_div_counter = 2'd1;
     
     always @ (posedge fourtyfiveHz_clock) begin
-        if (!(state == 5'b00010 || state == 5'b00101 || state == 5'b01000 || state == 5'b01011 || state == 5'b01110)) begin
+        if (state == 5'd3 || state == 5'd4 || state == 5'd6 || state == 5'd7 || state == 5'd9 || state == 5'd10 || state == 5'd12 || state == 5'd13 || state == 5'd15 || state == 5'd16) begin
             if (clk_div_counter == 2'd3) begin 
                 variable_clock <= ~variable_clock;
                 clk_div_counter <= 2'd1;
