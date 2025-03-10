@@ -40,31 +40,6 @@ module clock_1kHZ ( //incremenets every 1ms
     end
 endmodule
 
-module changeLED (
-    input sw4,
-    input SLOWCLK,
-    input [9:0] x, 
-    input [6:0] y, 
-    output reg [15:0] LEDdata
-    );
-    
-    always @ (posedge SLOWCLK) begin
-    //oled_data = sw4 ? 16'hF800 : 16'h07E0;
-    
-       if ((x >= 5 & x <= 65 & y <= 20 & y >= 2) 
-       | (x >= 40 & x <= 93 & y <= 40 & y >= 30)
-       | (x >= 6 & x <= 20 & y <= 55 & y >= 50)) begin
-       LEDdata = sw4 ? 16'h000F : 16'hF800;
-       //oled_data = 16'h000F;
-       end
-       else begin
-       LEDdata = sw4 ? 16'h8FA0 : 16'h07E0;
-       //oled_data = 16'h8FA0;
-       end
-       
-    end
-endmodule
-
 module increaseCOUNT (
     input button,
     input CLK,
@@ -200,56 +175,31 @@ endmodule
 
 module task_B (
     input CLK,
-    input CTRLbtn, 
-    input UPbtn,
-    input DOWNbtn,
+    input [4:0] pb, 
     output [7:0] Jx
-    
     );
     wire SLOWCLK;
     clock_6_25MHZ clovvk (CLK, SLOWCLK);
     
-    reg [15:0] oled_data; wire [15:0] olede;
+    wire [15:0] oled_data;
     wire [2:0] countONE; wire [2:0] countTWO; wire [2:0] countTHREE;
-    
-    wire sww;
-    //assign sww = sw4;
-    
-    initial begin
-    oled_data[0] <= olede[0];
-    oled_data[1] <= olede[1];
-    oled_data[2] <= olede[2];
-    oled_data[3] <= olede[3];
-    oled_data[4] <= olede[4];
-    oled_data[5] <= olede[5];
-    oled_data[6] <= olede[06];
-    oled_data[7] <= olede[07];
-    oled_data[8] <= olede[08];
-    oled_data[9] <= olede[09];
-    oled_data[10] <= olede[10];
-    oled_data[11] <= olede[11];
-    oled_data[12] <= olede[12];
-    oled_data[13] <= olede[13];
-    oled_data[14] <= olede[14];
-    oled_data[15] <= olede[15];
-    end    
     
     wire fb; wire [12:0] pi; wire sendp; wire samplep;
     Oled_Display oleddd (
-    .clk(SLOWCLK), .reset(0), 
-    .frame_begin(fb), .sending_pixels(sendp), .sample_pixel(samplep), 
-    .pixel_index(pi), .pixel_data(olede), 
-      .cs(Jx[0]), .sdin(Jx[1]), .sclk(Jx[3]), .d_cn(Jx[4]), .resn(Jx[5]), .vccen(Jx[6]),
-      .pmoden(Jx[7]));
+        .clk(SLOWCLK), .reset(0), 
+        .frame_begin(fb), .sending_pixels(sendp), .sample_pixel(samplep), 
+        .pixel_index(pi), .pixel_data(oled_data), 
+        .cs(Jx[0]), .sdin(Jx[1]), .sclk(Jx[3]), .d_cn(Jx[4]), .resn(Jx[5]), .vccen(Jx[6]),
+        .pmoden(Jx[7]));
       
       //max x is 95, max y is 63
       wire [9:0] x; wire [6:0] y;
       assign x = pi % 96;
       assign y = pi / 96;
       
-      increaseCOUNT upSQUARE (UPbtn, CLK, countONE);
-      increaseCOUNT centralSQUARE (CTRLbtn, CLK, countTWO);
-      increaseCOUNT downSQUARE (DOWNbtn, CLK, countTHREE);
-      firstSQ ledi (SLOWCLK, x, y, countONE, countTWO, countTHREE, olede);
+    increaseCOUNT upSQUARE (pb[0], CLK, countONE);
+    increaseCOUNT centralSQUARE (pb[4], CLK, countTWO);
+    increaseCOUNT downSQUARE (pb[1], CLK, countTHREE);
+      firstSQ ledi (SLOWCLK, x, y, countONE, countTWO, countTHREE, oled_data);
 
 endmodule
