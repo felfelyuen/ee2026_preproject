@@ -18,12 +18,11 @@ module Top_Student (
     input [15:0]sw,
     output [7:0]seg,
     output [3:0]an,
-    output [15:0]led
+    output reg [15:0]led
 );
 
-    assign led = sw;
     //Clocks
-    wire clk_6p25mhz, clk_25mhz, clk_30hz, clk_1khz, clk_500hz;
+    wire clk_6p25mhz, clk_25mhz, clk_30hz, clk_1khz, clk_500hz, clk_6hz, clk_10hz;
     
     //Pixel display
     reg reset;
@@ -32,10 +31,10 @@ module Top_Student (
     wire fb, sending_pixels, sample_pixel;
     
     //Task A-D oled_data
-    wire [15:0]oled_data_A = 0;
-    wire [15:0]oled_data_B = 0;
-    wire [15:0]oled_data_C = 0;
-    reg [15:0]oled_data_D = 0;
+    wire [15:0]oled_data_A;
+    wire [15:0]oled_data_B;
+    wire [15:0]oled_data_C;
+    reg [15:0]oled_data_D;
     
     //Passwords for Task A - D
     reg [15:0] password_A = 16'b0001001001111001;
@@ -62,7 +61,8 @@ module Top_Student (
     flexible_clock_divider my_30hz_clk (.basys_clock(basys_clock), .m(32'h196E69), .my_slow_clock(clk_30hz));
     flexible_clock_divider my_1khz_clk (.basys_clock(basys_clock), .m(32'hC34F), .my_slow_clock(clk_1khz));
     flexible_clock_divider my_500hz_clk (.basys_clock(basys_clock), .m(32'h1869F), .my_slow_clock(clk_500hz));
-    flexible_clock_divider slow_45Hz_clock (basys_clock, 555555, clk_45hz);
+    flexible_clock_divider my_6hz_clk (.basys_clock(basys_clock), .m(32'h7F2814), .my_slow_clock(clk_6hz));
+    flexible_clock_divider my_10hz_clk (.basys_clock(basys_clock), .m(32'h4C4B3F), .my_slow_clock(clk_10hz));
 
     Oled_Display led_display (
         .clk(clk_6p25mhz),
@@ -114,16 +114,6 @@ module Top_Student (
     //Task B
     task_B bb (.clock_1kHZ(clk_1khz), .clock_6_25MHZ(clk_6p25mhz), .pb(pb), .x(x), .y(y), .sw(sw), .oledd(oled_data_B));
 
-    //Task C
-    Task_C tc (
-        .sixp25MHz_clock(clk_6p25mhz),
-        .fourtyfiveHz_clock(clk_45hz),
-        .pixel_index(pixel_index),
-        .SW(sw),
-        .pb(pb),
-        .oled_data(oled_data_C)
-    );
-
     //Task D
     always @ (posedge clk_25mhz) begin
         if (x >= 66 && y <= 29) begin
@@ -152,5 +142,45 @@ module Top_Student (
                         : ( password_C == sw ) ? oled_data_C
                         : ( password_D == sw ) ? oled_data_D
                         : oled_display_groupID;
+                        
+    //Blink leds if password correct
+    always @ (*) begin
+        case (sw)
+            password_A: begin //0,3,4,5,6,9
+                led[0] <= clk_6hz;
+                led[3] <= clk_6hz;
+                led[4] <= clk_6hz;
+                led[5] <= clk_6hz;
+                led[6] <= clk_6hz;
+                led[9] <= clk_6hz;
+            end
+            password_B: begin //0,2,5,7,9
+                led[0] <= clk_10hz;
+                led[2] <= clk_10hz;
+                led[5] <= clk_10hz;
+                led[7] <= clk_10hz;
+                led[9] <= clk_10hz;
+            end
+            password_C: begin //0,2,6,8,9
+                led[0] <= clk_10hz;
+                led[2] <= clk_10hz;
+                led[6] <= clk_10hz;
+                led[8] <= clk_10hz;
+                led[9] <= clk_10hz;
+            end
+            password_D: begin //0,2,3,5,7,9
+                led[0] <= clk_6hz;
+                led[2] <= clk_6hz;
+                led[3] <= clk_6hz;
+                led[5] <= clk_6hz;
+                led[7] <= clk_6hz;
+                led[9] <= clk_6hz;
+            end
+            default begin
+                led <= sw;
+            end
+                
+        endcase
+    end
 
 endmodule
