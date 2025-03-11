@@ -1,0 +1,43 @@
+module increaseCOUNT (
+    input button,
+    input CLK,
+    input SW,
+    output reg [2:0] count
+    );
+    
+    reg [7:0] count200;
+    reg pressed;
+    
+    initial begin
+    count = 3'b000;
+    count200 = 8'b0000_0000;
+    pressed = 1'b0;
+    end
+    
+    always @(posedge CLK) begin
+    if (~SW) begin
+        count = 0;
+    end
+    else if (button | pressed) begin
+        if (count200 == 0) begin
+            //200ms ignore time is passed
+            if (button) begin
+                if (~pressed) begin
+                count = count + 1;
+                count = (count == 3'b110) ? 0 : count;
+                count200 = count200 + 1;
+                pressed = 1;
+                end
+                end
+            else begin
+                pressed = 0;
+                end
+        end
+        else begin
+            //in 200ms ignore mode
+            count200 = (count200 == 200) ? 0 : count200 + 1;
+        end
+    end
+   // end
+    end
+endmodule
