@@ -39,6 +39,7 @@ module task_A(
     reg [15:0] dist_sq;
        
     always @(*) begin
+    if (switch) begin
         x = pixel_index % 96;
         y = pixel_index / 96;
         dx = x - 48;
@@ -61,6 +62,7 @@ module task_A(
             end
         end
     end
+    end
 
 
     reg prev_btn1 = 0;
@@ -68,6 +70,7 @@ module task_A(
     reg prev_btn0 = 0;
 
     always @(posedge sclk_1khz) begin
+    if (switch) begin
         if (btn[0] && !prev_btn0) begin
             ring_enabled <= 1;  
         end
@@ -92,5 +95,7 @@ module task_A(
        prev_btn1 <= btn[1];
        prev_btn2 <= btn[2];
    end
+   end
+
 
 endmodule
