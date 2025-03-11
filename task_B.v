@@ -43,6 +43,7 @@ endmodule
 module increaseCOUNT (
     input button,
     input CLK,
+    input SW,
     output reg [2:0] count
     );
     
@@ -59,7 +60,7 @@ module increaseCOUNT (
     end
     
     always @(posedge SLOWCLK) begin
-    
+    if (SW) begin
     
     if (button | pressed) begin
         if (count200 == 0) begin
@@ -82,6 +83,7 @@ module increaseCOUNT (
         end
     end
     end
+    end
 endmodule
 
 module firstSQ (
@@ -91,6 +93,7 @@ module firstSQ (
     input [2:0] countONE,
     input [2:0] countTWO,
     input [2:0] countTHREE,
+    input SW,
     output reg [15:0] LEDdata
     );
     
@@ -176,6 +179,9 @@ endmodule
 module task_B (
     input CLK,
     input [4:0] pb, 
+    input x,
+    input y,
+    input SW,
     output [7:0] Jx
     );
     wire SLOWCLK;
@@ -184,22 +190,9 @@ module task_B (
     wire [15:0] oled_data;
     wire [2:0] countONE; wire [2:0] countTWO; wire [2:0] countTHREE;
     
-    wire fb; wire [12:0] pi; wire sendp; wire samplep;
-    Oled_Display oleddd (
-        .clk(SLOWCLK), .reset(0), 
-        .frame_begin(fb), .sending_pixels(sendp), .sample_pixel(samplep), 
-        .pixel_index(pi), .pixel_data(oled_data), 
-        .cs(Jx[0]), .sdin(Jx[1]), .sclk(Jx[3]), .d_cn(Jx[4]), .resn(Jx[5]), .vccen(Jx[6]),
-        .pmoden(Jx[7]));
-      
-      //max x is 95, max y is 63
-      wire [9:0] x; wire [6:0] y;
-      assign x = pi % 96;
-      assign y = pi / 96;
-      
-    increaseCOUNT upSQUARE (pb[0], CLK, countONE);
-    increaseCOUNT centralSQUARE (pb[4], CLK, countTWO);
-    increaseCOUNT downSQUARE (pb[1], CLK, countTHREE);
-      firstSQ ledi (SLOWCLK, x, y, countONE, countTWO, countTHREE, oled_data);
+    increaseCOUNT upSQUARE (pb[0], CLK, SW, countONE);
+    increaseCOUNT centralSQUARE (pb[4], CLK, SW, countTWO);
+    increaseCOUNT downSQUARE (pb[1], CLK, SW, countTHREE);
+    firstSQ ledi (SLOWCLK, x, y, countONE, countTWO, countTHREE, SW, oled_data);
 
 endmodule
