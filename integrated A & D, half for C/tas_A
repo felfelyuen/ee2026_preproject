@@ -22,12 +22,13 @@
 
 
 module task_A(
+    input clk,
     input [2:0] btn,
     input sclk_1khz,
     input [12:0] pixel_index,
     output reg [15:0] oled_data,
     input sclk_6p25mhz,
-    input switch
+    input switch 
 );
     
     integer x, y, dx, dy;
@@ -39,63 +40,99 @@ module task_A(
     reg [15:0] dist_sq;
        
     always @(*) begin
-
-        x = pixel_index % 96;
-        y = pixel_index / 96;
-        dx = x - 48;
-        dy = y - 32;
-        dist_sq = (dx * dx) + (dy * dy);
-
+        if (switch == 0) begin
      
-        oled_data = 16'b0000000000000000;
+            oled_data = 16'b0000000000000000;
+        end else begin
+         
+            x = pixel_index % 96;
+            y = pixel_index / 96;
+            dx = x - 48;
+            dy = y - 32;
+            dist_sq = (dx * dx) + (dy * dy);
 
-   
-        if ((x >= 3 && x <= 93 && y >= 3 && y <= 61) &&
-            ((x >= 3 && x <= 5) || (x >= 91 && x <= 93) || (y >= 3 && y <= 5) || (y >= 59 && y <= 61))) begin
+            oled_data = 16'b0000000000000000;
+
+            if ((x >= 3 && x <= 93 && y >= 3 && y <= 61) &&
+                ((x >= 3 && x <= 5) || (x >= 91 && x <= 93) || (y >= 3 && y <= 5) || (y >= 59 && y <= 61))) begin
                 oled_data = 16'b1010100000000000;  
-        end
+            end
 
-    
-        if (ring_enabled) begin
-            if (dist_sq >= (inner_diam * inner_diam / 4) && dist_sq <= (outer_diam * outer_diam / 4)) begin
-                oled_data = 16'b0000010101000000;  
+            if (ring_enabled) begin
+                if (dist_sq >= (inner_diam * inner_diam / 4) && dist_sq <= (outer_diam * outer_diam / 4)) begin
+                    oled_data = 16'b0000010101000000;  
+                end
             end
         end
     end
-
-
 
     reg prev_btn1 = 0;
     reg prev_btn2 = 0;
     reg prev_btn0 = 0;
 
     always @(posedge sclk_1khz) begin
+        if (switch == 0) begin
 
-        if (btn[0] && !prev_btn0) begin
-            ring_enabled <= 1;  
+            ring_enabled <= 0;
+            outer_diam <= 30;
+            inner_diam <= 25;
+            prev_btn0 <= 0;
+            prev_btn1 <= 0;
+            prev_btn2 <= 0;
+        end else begin
+
+            if (btn[0] && !prev_btn0) begin
+                ring_enabled <= 1;  
+            end
+
+            if (btn[1] && !prev_btn1) begin
+                if (outer_diam < 50) begin
+                    outer_diam <= outer_diam + 5;
+                    inner_diam <= inner_diam + 5;
+                end
+            end
+
+            if (btn[2] && !prev_btn2) begin
+                if (outer_diam > 10) begin
+                    outer_diam <= outer_diam - 5;
+                    inner_diam <= inner_diam - 5;
+                end
+            end
+
+            prev_btn0 <= btn[0];
+            prev_btn1 <= btn[1];
+            prev_btn2 <= btn[2];
         end
-       
-
-       if (btn[1] && !prev_btn1) begin
-           if (outer_diam < 50) begin
-               outer_diam <= outer_diam + 5;
-               inner_diam <= inner_diam + 5;
-           end
-       end
-       
-
-       if (btn[2] && !prev_btn2) begin
-           if (outer_diam > 10) begin
-               outer_diam <= outer_diam - 5;
-               inner_diam <= inner_diam - 5;
-           end
-       end
-
-       prev_btn0 <= btn[0];
-       prev_btn1 <= btn[1];
-       prev_btn2 <= btn[2];
-   end
-
-
-
+    end
+endmodule
+//////////
+module convert_to_xy(
+    input [12:0] pixel_index,
+    output [6:0] x,
+    output [5:0] y
+    );
+    
+    assign x = pixel_index % 96;
+    assign y = pixel_index / 96;
+    
+endmodule
+///
+module flexible_clock_divider(
+    input basys_clock,
+    input [31:0]m,
+    output reg my_slow_clock
+    );
+    
+    reg [31:0] COUNT;
+    
+    initial begin
+        COUNT = 0;
+        my_slow_clock = 1;
+    end
+    
+    always @ (posedge basys_clock) begin
+        COUNT <= ( COUNT == m ) ? 0 : COUNT + 1;
+        my_slow_clock <= ( COUNT == m ) ? ~my_slow_clock : my_slow_clock;
+    end
+    
 endmodule
