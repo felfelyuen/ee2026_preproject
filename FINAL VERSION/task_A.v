@@ -1,0 +1,115 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 09.03.2025 20:18:30
+// Design Name: 
+// Module Name: task_A
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module task_A(
+    input [2:0] btn,
+    input sclk_1khz,
+    input [12:0] pixel_index,
+    output reg [15:0] oled_data,
+    input [15:0] switch 
+);
+    
+    integer x, y, dx, dy;
+   
+    parameter DRAW_BORDER = 3'b000, DRAW_RING = 3'b001, UP_SIZE = 3'b010, LOW_SIZE = 3'b100;
+    reg ring_enabled = 0;  
+    reg [6:0] outer_diam = 30; 
+    reg [6:0] inner_diam = 25; 
+    reg [15:0] dist_sq;
+       
+    always @(*) begin
+        if (switch != 16'b0001001001111001) begin
+     
+            oled_data = 16'b0000000000000000;
+        end else begin
+         
+            x = pixel_index % 96;
+            y = pixel_index / 96;
+            dx = x - 48;
+            dy = y - 32;
+            dist_sq = (dx * dx) + (dy * dy);
+
+            oled_data = 16'b0000000000000000;
+
+            if ((x >= 3 && x <= 93 && y >= 3 && y <= 61) &&
+                ((x >= 3 && x <= 5) || (x >= 91 && x <= 93) || (y >= 3 && y <= 5) || (y >= 59 && y <= 61))) begin
+                oled_data = 16'b1010100000000000;  
+            end
+
+            if (ring_enabled) begin
+                if (dist_sq >= (inner_diam * inner_diam / 4) && dist_sq <= (outer_diam * outer_diam / 4)) begin
+                    oled_data = 16'b0000010101000000;  
+                end
+            end
+        end
+    end
+
+    reg prev_btn1 = 0;
+    reg prev_btn2 = 0;
+    reg prev_btn0 = 0;
+
+    always @(posedge sclk_1khz) begin
+        if (switch != 16'b0001001001111001) begin
+
+            ring_enabled <= 0;
+            outer_diam <= 30;
+            inner_diam <= 25;
+            prev_btn0 <= 0;
+            prev_btn1 <= 0;
+            prev_btn2 <= 0;
+        end else begin
+
+            if (btn[0] && !prev_btn0) begin
+                ring_enabled <= 1;  
+            end
+
+            if (btn[1] && !prev_btn1) begin
+                if (outer_diam < 50) begin
+                    outer_diam <= outer_diam + 5;
+                    inner_diam <= inner_diam + 5;
+                end
+            end
+
+            if (btn[2] && !prev_btn2) begin
+                if (outer_diam > 10) begin
+                    outer_diam <= outer_diam - 5;
+                    inner_diam <= inner_diam - 5;
+                end
+            end
+
+            prev_btn0 <= btn[0];
+            prev_btn1 <= btn[1];
+            prev_btn2 <= btn[2];
+        end
+    end
+endmodule
+//////////
+module convert_to_xy(
+    input [12:0] pixel_index,
+    output [6:0] x,
+    output [5:0] y
+    );
+    
+    assign x = pixel_index % 96;
+    assign y = pixel_index / 96;
+    
+endmodule
