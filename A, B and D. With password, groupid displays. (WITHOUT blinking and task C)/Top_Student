@@ -62,6 +62,7 @@ module Top_Student (
     flexible_clock_divider my_30hz_clk (.basys_clock(basys_clock), .m(32'h196E69), .my_slow_clock(clk_30hz));
     flexible_clock_divider my_1khz_clk (.basys_clock(basys_clock), .m(32'hC34F), .my_slow_clock(clk_1khz));
     flexible_clock_divider my_500hz_clk (.basys_clock(basys_clock), .m(32'h1869F), .my_slow_clock(clk_500hz));
+    flexible_clock_divider slow_45Hz_clock (basys_clock, 555555, clk_45hz);
 
     Oled_Display led_display (
         .clk(clk_6p25mhz),
@@ -112,6 +113,16 @@ module Top_Student (
     
     //Task B
     task_B bb (.clock_1kHZ(clk_1khz), .clock_6_25MHZ(clk_6p25mhz), .pb(pb), .x(x), .y(y), .sw(sw), .oledd(oled_data_B));
+
+    //Task C
+    Task_C tc (
+        .sixp25MHz_clock(clk_6p25mhz),
+        .fourtyfiveHz_clock(clk_45hz),
+        .pixel_index(pixel_index),
+        .SW(sw),
+        .pb(pb),
+        .oled_data(oled_data_C)
+    );
 
     //Task D
     always @ (posedge clk_25mhz) begin
