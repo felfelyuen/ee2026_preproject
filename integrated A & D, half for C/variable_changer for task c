@@ -1,0 +1,77 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 09.03.2025 13:13:42
+// Design Name: 
+// Module Name: variable_changer
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module variable_changer(
+    input [4:0] state,
+    input variable_clock,
+    output reg [6:0] var_x = 7'd84,
+    output reg [6:0] var_y = 6'd0
+    );
+    
+    reg [2:0] states = 0;
+    
+    always @ (posedge variable_clock) begin
+    if (state >= 5'd2 && state <5'd18) begin
+        if (states == 0) begin
+            var_y <= var_y + 1;
+            if (var_y == 52) begin
+                states <= 3'd1;
+            end
+        end
+        else if (states == 3'd1)  begin
+            var_x <= var_x - 1;
+            if (var_x == 42) begin
+                states <= 3'd2;
+            end
+        end
+        else if (states == 3'd2) begin
+            var_y <= var_y - 1;
+            if (var_y == 26) begin
+                 states <= 3'd3;
+            end
+        end
+        else if (states == 3'd3) begin
+            var_x <= var_x + 1;
+            if (var_x == 63) begin
+                states <= 3'd4;
+            end
+        end
+        else if (states == 3'd4) begin
+            var_y <= var_y - 1;
+            if (var_y == 0) begin
+                states <= 3'd5;
+            end
+        end
+        else if (states == 3'd5) begin
+            var_x <= var_x + 1;
+            if (var_x == 84) begin
+                states <= 3'd6;
+            end
+        end
+        else if (states == 6) begin
+            var_x <= 7'd84;
+            var_y <= 6'd0;
+            states <= 0;
+        end
+    end
+    end
+endmodule
