@@ -43,15 +43,12 @@ endmodule
 module increaseCOUNT (
     input button,
     input CLK,
-    input SW,
+    //input SW,
     output reg [2:0] count
     );
     
-    wire SLOWCLK; 
     reg [7:0] count200;
     reg pressed;
-    
-    clock_1kHZ clovk (CLK, SLOWCLK);
     
     initial begin
     count = 3'b000;
@@ -59,8 +56,8 @@ module increaseCOUNT (
     pressed = 1'b0;
     end
     
-    always @(posedge SLOWCLK) begin
-    if (SW) begin
+    always @(posedge CLK) begin
+    //if (SW) begin
     
     if (button | pressed) begin
         if (count200 == 0) begin
@@ -82,7 +79,7 @@ module increaseCOUNT (
             count200 = (count200 == 200) ? 0 : count200 + 1;
         end
     end
-    end
+   // end
     end
 endmodule
 
@@ -93,7 +90,7 @@ module firstSQ (
     input [2:0] countONE,
     input [2:0] countTWO,
     input [2:0] countTHREE,
-    input SW,
+    //input SW,
     output reg [15:0] LEDdata
     );
     
@@ -177,21 +174,41 @@ module firstSQ (
 endmodule
 
 module task_B (
-    input CLK,
+    input clock_1kHZ,
+    input clock_6_25MHZ,
     input [4:0] pb, 
     input x,
     input y,
     input SW,
-    output reg [15:0] oled_data
+    output reg [15:0] oledd
     );
-    wire SLOWCLK;
-    clock_6_25MHZ clovvk (CLK, SLOWCLK);
-
-    wire [2:0] countONE; wire [2:0] countTWO; wire [2:0] countTHREE;
     
-    increaseCOUNT upSQUARE (pb[0], CLK, SW, countONE);
-    increaseCOUNT centralSQUARE (pb[4], CLK, SW, countTWO);
-    increaseCOUNT downSQUARE (pb[1], CLK, SW, countTHREE);
-    firstSQ ledi (SLOWCLK, x, y, countONE, countTWO, countTHREE, SW, oled_data);
+    wire [2:0] countONE; wire [2:0] countTWO; wire [2:0] countTHREE;
+    wire [15:0] oled_data;
+    increaseCOUNT upSQUARE (pb[0], clock_1kHZ, countONE);
+    increaseCOUNT centralSQUARE (pb[4], clock_1kHZ, countTWO);
+    increaseCOUNT downSQUARE (pb[1], clock_1kHZ, countTHREE);
+    firstSQ ledi (clock_6_25MHZ, x, y, countONE, countTWO, countTHREE, oled_data);
+    
+    always @ (posedge clock_1kHZ) begin
+    //if (SW) begin
+    oledd[0] = oled_data[0];
+    oledd[1] = oled_data[1];
+    oledd[2] = oled_data[2];
+    oledd[3] = oled_data[3];
+    oledd[4] = oled_data[4];
+    oledd[5] = oled_data[5];
+    oledd[6] = oled_data[6];
+    oledd[7] = oled_data[7];
+    oledd[8] = oled_data[8];
+    oledd[9] = oled_data[9];
+    oledd[10] = oled_data[10];
+    oledd[11] = oled_data[11];
+    oledd[12] = oled_data[12];
+    oledd[13] = oled_data[13];
+    oledd[14] = oled_data[14];
+    oledd[15] = oled_data[15];
+    //end
+    end
 
 endmodule
