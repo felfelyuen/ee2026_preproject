@@ -10,36 +10,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module clock_6_25MHZ (
-    input CLK, 
-    output reg SLOWCLK
-    );
-     
-    reg [3:0] count = 4'b0000;
-    initial begin
-        SLOWCLK <= 0;
-    end
-    always @ (posedge CLK) begin
-    count <= (count == 4'b0111) ? 4'b0000 : count + 1;
-    SLOWCLK <= (count == 4'b0000) ? ~SLOWCLK : SLOWCLK; 
-    end
-endmodule
-
-module clock_1kHZ ( //incremenets every 1ms
-    input CLK, 
-    output reg SLOWCLK
-    );
-    
-    reg [15:0] count = 16'h0000;
-    initial begin
-        SLOWCLK <= 0;
-    end
-    always @ (posedge CLK) begin
-    count <= (count == 16'hC34F) ? 16'h0000 : count + 1;
-    SLOWCLK <= (count == 16'h0000) ? ~SLOWCLK : SLOWCLK; 
-    end
-endmodule
-
 module increaseCOUNT (
     input button,
     input CLK,
@@ -173,7 +143,6 @@ module firstSQ (
        end
    end
 endmodule
-
 
 module task_B (
     input clock_1kHZ,
