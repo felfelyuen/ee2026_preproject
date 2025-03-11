@@ -39,7 +39,7 @@ module task_A(
     reg [15:0] dist_sq;
        
     always @(*) begin
-        if (switch ！= 16'b0001001001111001) begin
+        if (switch != 16'b0001001001111001) begin
      
             oled_data = 16'b0000000000000000;
         end else begin
@@ -70,7 +70,7 @@ module task_A(
     reg prev_btn0 = 0;
 
     always @(posedge sclk_1khz) begin
-        if (switch ！= 16'b0001001001111001) begin
+        if (switch != 16'b0001001001111001) begin
 
             ring_enabled <= 0;
             outer_diam <= 30;
