@@ -182,12 +182,11 @@ module task_B (
     input x,
     input y,
     input SW,
-    output [7:0] Jx
+    output reg [15:0] oled_data
     );
     wire SLOWCLK;
     clock_6_25MHZ clovvk (CLK, SLOWCLK);
-    
-    wire [15:0] oled_data;
+
     wire [2:0] countONE; wire [2:0] countTWO; wire [2:0] countTHREE;
     
     increaseCOUNT upSQUARE (pb[0], CLK, SW, countONE);
