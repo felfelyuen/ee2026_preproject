@@ -26,7 +26,8 @@ module task_A(
     input sclk_1khz,
     input [12:0] pixel_index,
     output reg [15:0] oled_data,
-    input sclk_6p25mhz
+    input sclk_6p25mhz,
+    input switch
 );
     
     integer x, y, dx, dy;
