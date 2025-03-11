@@ -1,0 +1,89 @@
+module firstSQ (
+    input SLOWCLK,
+    input [6:0] x,
+    input [5:0] y,
+    input [2:0] countONE,
+    input [2:0] countTWO,
+    input [2:0] countTHREE,
+    //input SW,
+    output reg [15:0] LEDdata
+    );
+    
+    always @ (posedge SLOWCLK) begin
+        if (x >= 42 & x <= 55 & y <= 16 & y >= 3) begin
+            if (countONE == 0) begin
+                LEDdata = 16'hFFFF; //white
+            end 
+            else if (countONE == 1) begin
+                LEDdata = 16'hF800; //red
+            end
+            else if (countONE == 2) begin
+                LEDdata = 16'h07E0; //green
+            end
+            else if (countONE == 3) begin //blue
+                LEDdata = 16'h001F;
+            end
+            else if (countONE == 4) begin  //orange
+                LEDdata = 16'hFD20;
+            end
+            else if (countONE == 5) begin  //black
+                LEDdata = 16'h0000;
+            end
+        end
+        else 
+        if (x >= 42 & x <= 55 & y <= 32 & y >= 19) 
+            begin
+                if (countTWO == 0) begin
+                    LEDdata = 16'hFFFF; //white
+                end 
+                else if (countTWO == 1) begin
+                    LEDdata = 16'hF800; //red
+                end
+                else if (countTWO == 2) begin
+                    LEDdata = 16'h07E0; //green
+                end
+                else if (countTWO == 3) begin //blue
+                    LEDdata = 16'h001F;
+                end
+                else if (countTWO == 4) begin  //orange
+                    LEDdata = 16'hFD20;
+                end
+                else if (countTWO == 5) begin  //black
+                       LEDdata = 16'h0000;
+                end
+        end 
+        else if (x >= 42 & x <= 55 & y <= 48 & y >= 35) 
+            begin
+            if (countTHREE == 0) begin
+                LEDdata = 16'hFFFF; //white
+            end 
+            else if (countTHREE == 1) begin
+                LEDdata = 16'hF800; //red
+            end
+            else if (countTHREE == 2) begin
+                LEDdata = 16'h07E0; //green
+            end
+            else if (countTHREE == 3) begin //blue
+                LEDdata = 16'h001F;
+            end
+            else if (countTHREE == 4) begin  //orange
+                LEDdata = 16'hFD20;
+            end
+            else if (countTHREE == 5) begin  //black
+                LEDdata = 16'h0000;
+            end
+            end 
+       else if ( ((x - 48)*(x - 48) + (y - 56)*(y - 56)) <= 42 )
+            begin
+            if (countTHREE == 1 & countTWO == 1 & countONE == 1) begin
+                LEDdata = 16'hF800; //red
+                end
+            else if (countTHREE == 4 & countTWO == 4 & countONE == 4) begin  //orange
+                LEDdata = 16'hFD20;
+                end
+            end 
+       else begin
+       LEDdata = 16'h0000;
+       end
+   end
+endmodule
